@@ -37,20 +37,20 @@ void replace(char *str, char old, char new) {
       str[i] = new;
 }
 
-// opens process *cmd and stores output in *output
+// Opens process *cmd and stores output in *output
 void getcmd(const Block *block, char *output) {
   strcpy(output, block->icon);
+
   char *cmd = block->command;
   FILE *cmdf = popen(cmd, "r");
   if (!cmdf)
     return;
-  char c;
+
   int i = strlen(block->icon);
   fgets(output + i, CMDLENGTH - i, cmdf);
-  i = strlen(output);
-  if (delim != '\0' && --i)
-    output[i++] = delim;
-  output[i++] = '\0';
+
+  output[strlen(output)-1] = '\0'; // Removes \n at the end
+
   pclose(cmdf);
 }
 
@@ -84,9 +84,18 @@ void setupsignals() {
 int getstatus(char *str, char *last) {
   strcpy(last, str);
   str[0] = '\0';
-  for (int i = 0; i < LENGTH(blocks); i++)
-    strcat(str, statusbar[i]);
-  str[strlen(str) - 1] = '\0';
+
+  for (int i = 0; i < LENGTH(blocks); i++){
+      // Skip empty blocks
+      if(!strlen(statusbar[i]))
+          continue;
+
+      strcat(str, statusbar[i]);
+      if( i < LENGTH(blocks) - 1)
+          strcat(str, delim);
+  }
+
+  str[strlen(str)] = '\0';
   return strcmp(str, last); // 0 if they are the same
 }
 
@@ -141,7 +150,7 @@ void termhandler(int signum) {
 int main(int argc, char **argv) {
   for (int i = 0; i < argc; i++) {
     if (!strcmp("-d", argv[i]))
-      delim = argv[++i][0];
+      delim = argv[++i];
     else if (!strcmp("-p", argv[i]))
       writestatus = pstdout;
   }
