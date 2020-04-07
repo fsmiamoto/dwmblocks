@@ -26,7 +26,7 @@ static Display *dpy;
 static int screen;
 static Window root;
 static char statusbar[LENGTH(blocks)][CMDLENGTH] = {0};
-static char statusstr[2][256];
+static char statusstr[2][LENGTH(blocks)];
 static int statusContinue = 1;
 static void (*writestatus)() = setroot;
 
@@ -41,15 +41,14 @@ void replace(char *str, char old, char new) {
 void getcmd(const Block *block, char *output) {
   strcpy(output, block->icon);
 
-  char *cmd = block->command;
-  FILE *cmdf = popen(cmd, "r");
+  FILE *cmdf = popen(block->command, "r");
   if (!cmdf)
     return;
 
   int i = strlen(block->icon);
   fgets(output + i, CMDLENGTH - i, cmdf);
 
-  output[strlen(output)-1] = '\0'; // Removes \n at the end
+  output[strlen(output) - 1] = '\0'; // Removes \n at the end
 
   pclose(cmdf);
 }
@@ -85,14 +84,14 @@ int getstatus(char *str, char *last) {
   strcpy(last, str);
   str[0] = '\0';
 
-  for (int i = 0; i < LENGTH(blocks); i++){
-      // Skip empty blocks
-      if(!strlen(statusbar[i]))
-          continue;
+  for (int i = 0; i < LENGTH(blocks); i++) {
+    // Skip empty blocks
+    if (!strlen(statusbar[i]))
+      continue;
 
-      strcat(str, statusbar[i]);
-      if( i < LENGTH(blocks) - 1)
-          strcat(str, delim);
+    strcat(str, statusbar[i]);
+    if (i < LENGTH(blocks) - 1)
+      strcat(str, delim);
   }
 
   str[strlen(str)] = '\0';
@@ -114,9 +113,10 @@ void setroot() {
 }
 
 void pstdout() {
-  if (!getstatus(statusstr[0],
-                 statusstr[1])) // Only write out if text has changed.
+  // Only write out if text has changed.
+  if (!getstatus(statusstr[0], statusstr[1]))
     return;
+
   printf("%s\n", statusstr[0]);
   fflush(stdout);
 }
