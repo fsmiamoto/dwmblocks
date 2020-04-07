@@ -3,7 +3,8 @@ My build of the modular status bar for dwm written in C.
 
 The status bar is made up from text output from command-line programs.
 
-You can use the output of shell scripts or programs as a block with adding added properties such as an icon, update interval and a signal number.
+You can use the output of shell scripts or programs as a block with adding properties such as an icon, 
+update interval and a update signal.
 
 ## Adding or modifying blocks
 Blocks are added and removed by editing the `blocks.h` header file.
