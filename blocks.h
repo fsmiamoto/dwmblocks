@@ -7,6 +7,7 @@ typedef struct {
 
 static const Block blocks[] = {
     {"", "volume", 0, 10},
+    {"/ ", "df | grep '/$' | awk '{print $5}'", 5, 0},
     {"mem ", "mem-perc", 5, 0},
     {"cpu ", "cpu-perc", 5, 0},
     {"", "date +'%H:%M - %m/%d'", 5, 0},
